@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/widgets/bottom_card.dart';
+import 'package:twarz/ui/widgets/face_camera.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key, required this.cameras}) : super(key: key);
@@ -50,49 +51,26 @@ class _CameraPageState extends State<CameraPage> {
     if (!_cameraController.value.isInitialized) {
       return Container();
     }
-    return Scaffold(
-      backgroundColor: kBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 5,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: kPaddingValue,
-                  vertical: kPaddingValue,
-                ),
-                child: ClipRRect(
-                  borderRadius: kBorderRadius,
-                  child: Stack(
-                    children: [
-                      CameraPreview(_cameraController),
-                      Positioned(
-                        top: kPaddingValue,
-                        right: kPaddingValue,
-                        child: Icon(
-                          Icons.lens,
-                          size: kPaddingValue,
-                          color: kBackgroundColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: kPaddingValue,
             ),
-            const Flexible(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: kPaddingValue),
-                child: BottomCard(),
-              ),
+            child: FaceCamera(
+              cameraController: _cameraController,
             ),
-            const SizedBox(
-              height: kPaddingValue,
-            ),
-          ],
+          ),
         ),
-      ),
+        const Padding(
+          padding: EdgeInsets.only(
+            top: kPaddingValue / 2,
+            bottom: kPaddingValue * 1.5,
+          ),
+          child: BottomCard(),
+        ),
+      ],
     );
   }
 }

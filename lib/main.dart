@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:twarz/ui/pages/camera_page.dart';
+import 'package:twarz/ui/application.dart';
 
 late List<CameraDescription>? _camerasList;
 
@@ -25,8 +25,8 @@ class Twarz extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      home: CameraPage(
-        cameras: _camerasList!,
+      home: Application(
+        camerasList: _camerasList,
       ),
     );
   }

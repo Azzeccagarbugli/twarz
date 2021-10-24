@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Project name
-const kProjectName = 'T.W.E.R.Z';
+const kProjectName = 'T.W.A.R.Z';
 
 // Background color
 final kBackgroundColor = Colors.white;

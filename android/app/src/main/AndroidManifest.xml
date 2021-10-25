@@ -4,6 +4,9 @@
     <!-- Permissions options for the `camera` group -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- Permissions options for the `internet` group -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
    <application
         android:label="twarz"
         android:icon="@mipmap/ic_launcher">

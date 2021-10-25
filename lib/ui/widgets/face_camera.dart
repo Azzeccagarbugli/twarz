@@ -15,26 +15,7 @@ class FaceCamera extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: kBorderRadius,
-      child: Stack(
-        children: [
-          CameraPreview(_cameraController),
-          Positioned(
-            top: kPaddingValue,
-            right: kPaddingValue,
-            child: Container(
-              decoration: BoxDecoration(
-                color: kBackgroundColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.lens,
-                size: kPaddingValue,
-                color: Colors.red.shade400,
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: CameraPreview(_cameraController),
     );
   }
 }

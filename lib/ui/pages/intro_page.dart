@@ -37,7 +37,7 @@ class IntroPage extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 200,
+          height: 150,
           child: ClipRRect(
             borderRadius: kBorderRadius,
             child: Stack(

@@ -17,7 +17,7 @@ class TitleBar extends StatelessWidget {
           Text(
             kProjectName,
             style: GoogleFonts.pressStart2p().copyWith(
-              fontSize: 12.0,
+              fontSize: 16.0,
             ),
           ),
           Icon(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 const kProjectName = 'T.W.A.R.Z';
 
 // Background color
-final kBackgroundColor = Colors.white;
+const kBackgroundColor = Colors.white;
 
 // Padding value
 const double kPaddingValue = 16.0;

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:confetti/confetti.dart';
@@ -53,7 +54,7 @@ class _ApplicationState extends State<Application> {
           Icon(
             Icons.psychology_rounded,
             size: 700,
-            color: Colors.grey.shade50,
+            color: Colors.grey.shade100,
           ),
           Align(
             alignment: Alignment.topCenter,
@@ -61,6 +62,10 @@ class _ApplicationState extends State<Application> {
               confettiController: _confettiController,
               blastDirection: pi / 2,
             ),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: const SizedBox(),
           ),
           SafeArea(
             child: Column(

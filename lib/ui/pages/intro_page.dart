@@ -72,11 +72,11 @@ class IntroPage extends StatelessWidget {
               ),
               const StepTutorial(
                 text:
-                    'Keep the phone right in front of you and express any emotions',
+                    'Keep the phone right in front of you and express any feelings',
                 number: 2,
               ),
               const StepTutorial(
-                text: 'Enojoy your experience',
+                text: 'Enjoy your experience',
                 number: 3,
               ),
               const StepTutorial(

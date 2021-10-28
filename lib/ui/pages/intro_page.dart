@@ -1,27 +1,89 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:twarz/theme/constants.dart';
+import 'package:twarz/ui/widgets/step_tutorial.dart';
 import 'package:twarz/ui/widgets/twerz_button.dart';
 import 'package:twarz/utils/transparent_image.dart';
 
 class IntroPage extends StatelessWidget {
-  const IntroPage({Key? key, required PageController pageController})
-      : _pageController = pageController,
+  const IntroPage({Key? key, required Function() onTap})
+      : _onTap = onTap,
         super(key: key);
 
-  final PageController _pageController;
+  final Function() _onTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(
-          child: AutoSizeText(
-            kEmotions,
-            style: TextStyle(
-              height: 1.5,
-              color: Colors.grey.shade800,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Chip(
+              backgroundColor: Colors.amber,
+              label: AutoSizeText(
+                'Welcome',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
+            SizedBox(
+              width: kSpaceXS,
+            ),
+            Chip(
+              backgroundColor: Colors.blue,
+              label: AutoSizeText(
+                kWelcome,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: kSpaceXS,
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AutoSizeText(
+                kEmotions,
+                style: TextStyle(
+                  height: 1.5,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const StepTutorial(
+                text:
+                    'Tap on the start button and your camera will be activated',
+                number: 0,
+              ),
+              const StepTutorial(
+                text:
+                    'Watch your phone and read what the system thinks about your emotions',
+                number: 1,
+              ),
+              const StepTutorial(
+                text:
+                    'Keep the phone right in front of you and express any emotions',
+                number: 2,
+              ),
+              const StepTutorial(
+                text: 'Enojoy your experience',
+                number: 3,
+              ),
+              const StepTutorial(
+                text: 'Share the results',
+                number: 4,
+              ),
+            ],
           ),
         ),
         Padding(
@@ -60,12 +122,7 @@ class IntroPage extends StatelessWidget {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: TwerzButton(
-                    onTap: () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeIn,
-                      );
-                    },
+                    onTap: _onTap,
                   ),
                 ),
               ],

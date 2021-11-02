@@ -22,7 +22,7 @@ Tell me What Affects youR buZz
 
 // Description of emotions
 const kEmotions = '''
-T.W.A.R.Z. is a simple app that will is able to detect and store your emotions.
+T.W.A.R.Z. is a simple app that is able to detect and store your emotions.
 
 Its goal is to help researchers to collect valuable data to be used in their attempt to make the world a better place!
 

@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:twarz/ui/application.dart';
+import 'package:twarz/ui/widgets/init_twarz.dart';
 
 late List<CameraDescription>? _camerasList;
 
@@ -31,7 +31,7 @@ class Twarz extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      home: Application(
+      home: InitTwarz(
         camerasList: _camerasList,
       ),
     );

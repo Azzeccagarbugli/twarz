@@ -6,6 +6,9 @@ const kProjectName = 'T.W.A.R.Z.';
 // Background color
 const kBackgroundColor = Colors.white;
 
+// Logo density
+const double kLogoSize = 160;
+
 // Padding value
 const double kPaddingValue = 16.0;
 

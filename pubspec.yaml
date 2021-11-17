@@ -17,6 +17,10 @@ dependencies:
   google_fonts: ^2.1.0
   permission_handler: ^8.2.5
   radar_chart: ^2.1.0
+  your_splash:
+    git: 
+       url: https://github.com/Azzeccagarbugli/your_splash.git
+       ref: null-safety
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.2

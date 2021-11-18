@@ -17,7 +17,7 @@ class SplashLogo extends StatelessWidget {
               child: Icon(
                 Icons.psychology_rounded,
                 size: kLogoSize,
-                color: Colors.black,
+                color: kDarkestText,
               ),
             ),
             Align(

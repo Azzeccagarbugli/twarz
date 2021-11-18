@@ -19,11 +19,12 @@ class TitleBar extends StatelessWidget {
             kProjectName,
             style: GoogleFonts.pressStart2p().copyWith(
               fontSize: 16.0,
+              color: kDarkText,
             ),
           ),
-          Icon(
+          const Icon(
             Icons.psychology_rounded,
-            color: Colors.grey.shade300,
+            color: kDarkText,
           ),
         ],
       ),

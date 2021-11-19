@@ -28,7 +28,7 @@ const double kSpaceM = 16.0;
 const double kSpaceL = 32.0;
 
 // Space horizontal text in Onboarding
-const double kPaddingHor = 24.0;
+const double kPaddingHor = 42.0;
 
 // Border radius
 final BorderRadius kBorderRadius = BorderRadius.circular(16.0);

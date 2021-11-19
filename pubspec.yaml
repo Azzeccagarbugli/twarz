@@ -15,6 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^2.1.0
+  no_glow_scroll: ^0.0.2
   permission_handler: ^8.2.5
   radar_chart: ^2.1.0
   smooth_page_indicator: ^1.0.0+2

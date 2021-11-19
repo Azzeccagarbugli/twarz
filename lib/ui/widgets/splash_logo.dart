@@ -22,11 +22,14 @@ class SplashLogo extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: AutoSizeText(
-                kProjectName,
-                style: GoogleFonts.pressStart2p().copyWith(
-                  fontSize: 12.0,
-                  color: Colors.grey.shade300,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: kSpaceM),
+                child: AutoSizeText(
+                  kProjectName,
+                  style: GoogleFonts.pressStart2p().copyWith(
+                    fontSize: 12.0,
+                    color: Colors.grey.shade300,
+                  ),
                 ),
               ),
             ),

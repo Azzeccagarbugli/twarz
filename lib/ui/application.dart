@@ -1,14 +1,18 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'dart:io' show Platform;
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:no_glow_scroll/no_glow_scroll.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/pages/camera_page.dart';
 import 'package:twarz/ui/pages/intro_page.dart';
+import 'package:twarz/ui/widgets/face_camera.dart';
 import 'package:twarz/ui/widgets/title_bar.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
@@ -119,38 +123,40 @@ class _ApplicationState extends State<Application> {
                   child: TitleBar(),
                 ),
                 Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    children: [
-                      OnboardingContent(
-                        path: 'assets/onboarding/welcome.png',
-                        title: 'Welcome',
-                        subtitle:
-                            'Watch your phone and read what the system thinks about your emotions',
-                        offset: _pageOffset,
-                      ),
-                      OnboardingContent(
-                        path: 'assets/onboarding/photo.png',
-                        title: 'Emotions',
-                        subtitle:
-                            'Watch your phone and read what the system thinks about your emotions',
-                        offset: _pageOffset - 1,
-                      ),
-                      OnboardingContent(
-                        path: 'assets/onboarding/cringe.png',
-                        title: 'Emotions',
-                        subtitle:
-                            'Watch your phone and read what the system thinks about your emotions',
-                        offset: _pageOffset - 2,
-                      ),
-                      OnboardingContent(
-                        path: 'assets/onboarding/new.png',
-                        title: 'Emotions',
-                        subtitle:
-                            'Watch your phone and read what the system thinks about your emotions',
-                        offset: _pageOffset - 3,
-                      ),
-                    ],
+                  child: NoGlowScroll(
+                    child: PageView(
+                      controller: _pageController,
+                      children: [
+                        OnboardingContent(
+                          path: 'assets/onboarding/welcome.png',
+                          title: 'Welcome',
+                          subtitle:
+                              "What you know you can't explain, but you feel it and Twarz will help you in this, in the nicest way possible",
+                          offset: _pageOffset,
+                        ),
+                        OnboardingContent(
+                          path: 'assets/onboarding/photo.png',
+                          title: 'Emotions',
+                          subtitle:
+                              'Ekman described six of them, we want to push this even further using just your phone',
+                          offset: _pageOffset - 1,
+                        ),
+                        OnboardingContent(
+                          path: 'assets/onboarding/cringe.png',
+                          title: 'Choice',
+                          subtitle:
+                              'Ever have that feeling where you’re not sure if you’re awake or dreaming? Now you can recognize',
+                          offset: _pageOffset - 2,
+                        ),
+                        OnboardingContent(
+                          path: 'assets/onboarding/new.png',
+                          title: "Let's start",
+                          subtitle:
+                              'Watch your phone and read what the system thinks about your feelings, enojoy this experience',
+                          offset: _pageOffset - 3,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SmoothPageIndicator(
@@ -175,10 +181,40 @@ class _ApplicationState extends State<Application> {
                         curve: Curves.easeIn,
                       );
                     } else {
-                      debugPrint('Ciao');
+                      if (widget._camerasList != null) {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    Scaffold(
+                              body: FaceCamera(
+                                cameraController: CameraController(
+                                  widget._camerasList![1],
+                                  ResolutionPreset.max,
+                                ),
+                              ),
+                            ),
+                            transitionDuration: const Duration(seconds: 1),
+                            transitionsBuilder: (_, animation, secAnim, child) {
+                              final tween = Tween(begin: 0.0, end: 1.0).chain(
+                                CurveTween(curve: Curves.easeInOutCirc),
+                              );
+                              return FadeTransition(
+                                opacity: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      }
                     }
                   },
                 ),
+                if (Platform.isAndroid)
+                  const SizedBox(
+                    height: kSpaceM,
+                  )
               ],
             ),
           ),
@@ -217,7 +253,7 @@ class OnboardingContent extends StatelessWidget {
             child: ClipRRect(
               child: Image.asset(
                 path,
-                height: MediaQuery.of(context).size.height / 2.5,
+                height: MediaQuery.of(context).size.height / 3,
                 alignment: Alignment(-offset.abs(), 0),
               ),
             ),

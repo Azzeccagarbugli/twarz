@@ -5,10 +5,13 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/pages/camera_page.dart';
 import 'package:twarz/ui/pages/intro_page.dart';
 import 'package:twarz/ui/widgets/title_bar.dart';
+import 'package:wave/config.dart';
+import 'package:wave/wave.dart';
 
 class Application extends StatefulWidget {
   const Application({
@@ -81,19 +84,40 @@ class _ApplicationState extends State<Application> {
             filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
             child: const SizedBox(),
           ),
+          Positioned(
+            bottom: 0,
+            top: 10,
+            left: 0,
+            right: 0,
+            child: WaveWidget(
+              config: CustomConfig(
+                gradients: [
+                  [kPrimaryColor, kPrimaryColor],
+                  [kSecondaryColor, kSecondaryColor],
+                  [kThirdColor, kThirdColor],
+                ],
+                durations: [35000, 19440, 10800],
+                heightPercentages: [0.7, 0.75, 0.79],
+                gradientBegin: Alignment.bottomLeft,
+                gradientEnd: Alignment.topRight,
+              ),
+              waveAmplitude: 0,
+              size: Size.infinite,
+            ),
+          ),
           SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // const SizedBox(
-                //   height: kSpaceS,
-                // ),
-                // const Padding(
-                //   padding: EdgeInsets.symmetric(
-                //     horizontal: kPaddingValue,
-                //   ),
-                //   child: TitleBar(),
-                // ),
+                const SizedBox(
+                  height: kSpaceS,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: kPaddingValue,
+                  ),
+                  child: TitleBar(),
+                ),
                 Expanded(
                   child: PageView(
                     controller: _pageController,
@@ -129,24 +153,31 @@ class _ApplicationState extends State<Application> {
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 8,
-                      width: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                  ],
+                SmoothPageIndicator(
+                  controller: _pageController, // PageController
+                  count: 4,
+                  effect: const SwapEffect(
+                    activeDotColor: Colors.white,
+                    dotColor: kDarkestText,
+                    dotHeight: 10.0,
+                    dotWidth: 10.0,
+                  ),
                 ),
                 const SizedBox(
                   height: kSpaceM,
                 ),
                 AnimatedButton(
-                  onTap: () {},
+                  feel: _pageOffset == 3,
+                  onTap: () {
+                    if (_pageOffset != 3) {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeIn,
+                      );
+                    } else {
+                      debugPrint('Ciao');
+                    }
+                  },
                 ),
               ],
             ),
@@ -173,7 +204,7 @@ class OnboardingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Offest calc
+    // Offest math
     final gauss = exp(-(pow(offset.abs() - 0.5, 2) / 0.08));
 
     return Transform.translate(
@@ -215,11 +246,15 @@ class OnboardingContent extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.grey,
+                  height: 1.4,
                   fontSize: 16,
                 ),
               ),
             ),
-          )
+          ),
+          const SizedBox(
+            height: kSpaceL,
+          ),
         ],
       ),
     );
@@ -227,9 +262,11 @@ class OnboardingContent extends StatelessWidget {
 }
 
 class AnimatedButton extends StatefulWidget {
-  const AnimatedButton({Key? key, required this.onTap}) : super(key: key);
+  const AnimatedButton({Key? key, required this.onTap, required this.feel})
+      : super(key: key);
 
   final Function() onTap;
+  final bool feel;
 
   @override
   _AnimatedButtonState createState() => _AnimatedButtonState();
@@ -245,7 +282,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       upperBound: 0.1,
     )..addListener(() {
         setState(() {});
@@ -283,18 +320,69 @@ class _AnimatedButtonState extends State<AnimatedButton>
               borderRadius: kBorderRadius,
               color: kDarkestText,
             ),
-            child: Container(
-              margin: const EdgeInsets.all(kSpaceM),
-              child: const Center(
-                child: Text(
-                  'Next',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  child: Container(
+                    margin: const EdgeInsets.all(kSpaceM),
+                    child: Center(
+                      child: AnimatedCrossFade(
+                        duration: const Duration(milliseconds: 300),
+                        layoutBuilder: (
+                          topChild,
+                          topChildKey,
+                          bottomChild,
+                          bottomChildKey,
+                        ) {
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Positioned(
+                                key: bottomChildKey,
+                                child: bottomChild,
+                              ),
+                              Positioned(
+                                key: topChildKey,
+                                child: topChild,
+                              )
+                            ],
+                          );
+                        },
+                        firstChild: const Text(
+                          'Next',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        secondChild: const Text(
+                          'Feel yourself',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        crossFadeState: !widget.feel
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const Padding(
+                  padding: EdgeInsets.only(right: kSpaceM),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

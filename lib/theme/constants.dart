@@ -46,3 +46,20 @@ Its goal is to help researchers to collect valuable data to be used in their att
 
 Let's go!
 ''';
+
+// Route
+PageRouteBuilder<dynamic> routeToPage({required Widget widget}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => widget,
+    transitionDuration: const Duration(seconds: 1),
+    transitionsBuilder: (_, animation, secAnim, child) {
+      final tween = Tween(begin: 0.0, end: 1.0).chain(
+        CurveTween(curve: Curves.easeInOutCirc),
+      );
+      return FadeTransition(
+        opacity: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}

@@ -1,8 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_vision/google_ml_vision.dart';
 import 'package:twarz/theme/constants.dart';
+import 'package:twarz/ui/widgets/animated_button.dart';
 import 'package:twarz/ui/widgets/bottom_card.dart';
-import 'package:twarz/ui/widgets/face_camera.dart';
+import 'package:twarz/utils/detector.dart';
+import 'package:twarz/utils/scanner.dart';
+
+const double _height = 200;
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key, required this.cameras}) : super(key: key);
@@ -13,31 +18,107 @@ class CameraPage extends StatefulWidget {
   State<CameraPage> createState() => _CameraPageState();
 }
 
-class _CameraPageState extends State<CameraPage> {
+class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   List<double> values1 = [0.4, 0.8, 0.65];
   List<double> values2 = [0.5, 0.3, 0.85];
+
+  bool _isDetecting = false;
+  dynamic _scanResults;
 
   late CameraController _cameraController;
   late CameraDescription _cameraDescription;
 
-  @override
-  void initState() {
-    super.initState();
+  final FaceDetector _faceDetector = GoogleVision.instance
+      .faceDetector(const FaceDetectorOptions(enableContours: true));
 
+  Future<void> _initializeCamera() async {
     _cameraDescription = widget.cameras[1];
 
     _cameraController = CameraController(
       _cameraDescription,
-      ResolutionPreset.ultraHigh,
+      ResolutionPreset.high,
       enableAudio: false,
     );
 
-    _cameraController.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
+    await _cameraController.initialize();
+
+    await _cameraController.startImageStream((CameraImage image) {
+      if (_isDetecting) return;
+
+      _isDetecting = true;
+
+      ScannerUtils.detect(
+        image: image,
+        detectInImage: _faceDetector.processImage,
+        imageRotation: widget.cameras[1].sensorOrientation,
+      ).then(
+        (dynamic results) {
+          setState(() {
+            _scanResults = results;
+          });
+        },
+      ).whenComplete(
+        () => Future.delayed(
+          const Duration(
+            milliseconds: 100,
+          ),
+          () => {_isDetecting = false},
+        ),
+      );
     });
+  }
+
+  Future<void> onNewCameraSelected(CameraDescription cameraDescription) async {
+    _cameraController = CameraController(
+      cameraDescription,
+      ResolutionPreset.max,
+    );
+
+    _cameraController.addListener(() {
+      if (mounted) setState(() {});
+      if (_cameraController.value.hasError) {
+        debugPrint('Si, errore');
+      }
+    });
+
+    try {
+      await _cameraController.initialize();
+    } on CameraException catch (e) {
+      debugPrint(e.toString());
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Widget _buildResults() {
+    final Size imageSize = Size(
+      _cameraController.value.previewSize!.height,
+      _cameraController.value.previewSize!.width,
+    );
+
+    return CustomPaint(
+      painter: FaceDetectorPainter(imageSize, _scanResults as List<Face>),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_cameraController.value.isInitialized) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      _cameraController.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      onNewCameraSelected(_cameraDescription);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
   }
 
   @override
@@ -51,26 +132,48 @@ class _CameraPageState extends State<CameraPage> {
     if (!_cameraController.value.isInitialized) {
       return Container();
     }
-    return Column(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              bottom: kPaddingValue,
-            ),
-            child: FaceCamera(
-              cameraController: _cameraController,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: CameraPreview(
+              _cameraController,
             ),
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(
-            top: kPaddingValue / 2,
-            bottom: kPaddingValue * 1.5,
+          _buildResults(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: _height,
+              margin:
+                  const EdgeInsets.fromLTRB(kSpaceM, kSpaceM, kSpaceM, kSpaceM),
+              decoration: BoxDecoration(
+                borderRadius: kBorderRadius,
+                color: kBackgroundColor,
+              ),
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(kSpaceM),
+                    child: BottomCard(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(kSpaceS),
+                    child: AnimatedButton(
+                      title: 'Find more',
+                      onTap: () {},
+                      feel: false,
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: BottomCard(),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

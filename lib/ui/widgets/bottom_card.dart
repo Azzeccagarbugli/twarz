@@ -63,10 +63,10 @@ class BottomCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const AutoSizeText(
-                'Depressione',
+                'Happiness',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 22,
+                  fontSize: 26,
                 ),
               ),
               const SizedBox(

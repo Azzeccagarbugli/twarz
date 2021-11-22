@@ -24,7 +24,7 @@ class OnboardingContent extends StatelessWidget {
     final gauss = exp(-(pow(offset.abs() - 0.5, 2) / 0.08));
 
     return Transform.translate(
-      offset: Offset(-32 * gauss * offset.sign, 0),
+      offset: Offset(gauss * offset.sign, 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

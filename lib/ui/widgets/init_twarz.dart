@@ -33,7 +33,6 @@ class _InitTwarzState extends State<InitTwarz> {
       _counterApp = _counterIncremented;
     });
 
-    debugPrint('Start number: $_counterIncremented');
     await _prefs.setInt('counter', _counterIncremented);
   }
 

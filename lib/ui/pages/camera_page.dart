@@ -92,17 +92,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
   }
 
-  Widget _buildResults() {
-    final Size imageSize = Size(
-      _cameraController.value.previewSize!.height,
-      _cameraController.value.previewSize!.width,
-    );
-
-    return CustomPaint(
-      painter: FaceDetectorPainter(imageSize, _scanResults as List<Face>),
-    );
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!_cameraController.value.isInitialized) {
@@ -133,22 +122,31 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       return Container();
     }
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          Positioned.fill(
+          SizedBox(
+            height: _cameraController.value.previewSize!.height,
             child: CameraPreview(
               _cameraController,
             ),
           ),
-          _buildResults(),
+          SizedBox(
+            height: _cameraController.value.previewSize!.height,
+            width: _cameraController.value.previewSize!.width,
+            child: CustomPaint(
+              painter: FaceDetectorPainter(
+                Size(
+                  _cameraController.value.previewSize!.height,
+                  _cameraController.value.previewSize!.width,
+                ),
+                _scanResults as List<Face>,
+              ),
+            ),
+          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               height: _height,
-              margin:
-                  const EdgeInsets.fromLTRB(kSpaceM, kSpaceM, kSpaceM, kSpaceM),
               decoration: BoxDecoration(
                 borderRadius: kBorderRadius,
                 color: kBackgroundColor,

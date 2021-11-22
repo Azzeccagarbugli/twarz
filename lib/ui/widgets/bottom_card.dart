@@ -73,7 +73,7 @@ class BottomCard extends StatelessWidget {
                 height: kSpaceXS,
               ),
               AutoSizeText(
-                'È una malattia invalidante che coinvolge spesso sia la sfera affettiva sia cognitiva della persona, influendo negativamente in modo disadattivo sulla vita familiare, lavorativa, sullo studio, sulle abit',
+                'The term happiness is used in the context of mental or emotional states, including positive or pleasant emotions ranging from contentment to intense joy. It is also used in the context of life satisfaction, subjective well-being, eudaimonia, flourishing and well-being.',
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

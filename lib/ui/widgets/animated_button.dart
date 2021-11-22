@@ -99,7 +99,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                         firstChild: Text(
                           widget.title,
                           style: TextStyle(
-                            fontSize: !widget.feel ? 20 : 24,
+                            fontSize: widget.title != 'Next' ? 20 : 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),

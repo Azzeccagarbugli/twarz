@@ -161,11 +161,12 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               width: _cameraController.value.previewSize!.width,
               child: CustomPaint(
                 painter: FaceDetectorPainter(
-                  Size(
+                  absoluteImageSize: Size(
                     _cameraController.value.previewSize!.height,
                     _cameraController.value.previewSize!.width,
                   ),
-                  _scanResults as List<Face>,
+                  faces: _scanResults as List<Face>,
+                  camPos: _direction == CameraLensDirection.back,
                 ),
               ),
             ),

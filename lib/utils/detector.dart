@@ -5,11 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_ml_vision/google_ml_vision.dart';
 
 enum Detector {
-  barcode,
   face,
-  label,
-  cloudLabel,
-  text,
 }
 
 const List<Point<int>> faceMaskConnections = [
@@ -66,10 +62,15 @@ const List<Point<int>> faceMaskConnections = [
 ];
 
 class FaceDetectorPainter extends CustomPainter {
-  FaceDetectorPainter(this.absoluteImageSize, this.faces);
+  FaceDetectorPainter({
+    required this.absoluteImageSize,
+    required this.faces,
+    required this.camPos,
+  });
 
   final Size absoluteImageSize;
   final List<Face> faces;
+  final bool camPos;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -88,31 +89,55 @@ class FaceDetectorPainter extends CustomPainter {
 
     for (final Face face in faces) {
       final contour = face.getContour(FaceContourType.allPoints);
-      canvas.drawPoints(
-        ui.PointMode.points,
-        contour!.positionsList
-            .map(
-              (offset) => Offset(
-                size.width - (offset.dx * scaleX),
-                offset.dy * scaleY,
-              ),
-            )
-            .toList(),
-        paint,
-      );
+
+      if (!camPos) {
+        canvas.drawPoints(
+          ui.PointMode.points,
+          contour!.positionsList
+              .map(
+                (offset) => Offset(
+                  size.width - (offset.dx * scaleX),
+                  offset.dy * scaleY,
+                ),
+              )
+              .toList(),
+          paint,
+        );
+      } else {
+        canvas.drawPoints(
+          ui.PointMode.points,
+          contour!.positionsList
+              .map(
+                (offset) => Offset(
+                  offset.dx * scaleX,
+                  offset.dy * scaleY,
+                ),
+              )
+              .toList(),
+          paint,
+        );
+      }
 
       for (final connection in faceMaskConnections) {
-        final tmpDxConnectionX = size.width -
-            contour.positionsList[connection.x].scale(scaleX, scaleY).dx;
-        final tmpDyConnectionX =
-            contour.positionsList[connection.x].scale(scaleX, scaleY).dy;
-        final a = Offset(tmpDxConnectionX, tmpDyConnectionX);
-        final tmpDxConnectionY = size.width -
-            contour.positionsList[connection.y].scale(scaleX, scaleY).dx;
-        final tmpDyConnectionY =
-            contour.positionsList[connection.y].scale(scaleX, scaleY).dy;
-        final b = Offset(tmpDxConnectionY, tmpDyConnectionY);
-        canvas.drawLine(a, b, paint);
+        if (!camPos) {
+          final tmpDxConnectionX = size.width -
+              contour.positionsList[connection.x].scale(scaleX, scaleY).dx;
+          final tmpDyConnectionX =
+              contour.positionsList[connection.x].scale(scaleX, scaleY).dy;
+          final a = Offset(tmpDxConnectionX, tmpDyConnectionX);
+          final tmpDxConnectionY = size.width -
+              contour.positionsList[connection.y].scale(scaleX, scaleY).dx;
+          final tmpDyConnectionY =
+              contour.positionsList[connection.y].scale(scaleX, scaleY).dy;
+          final b = Offset(tmpDxConnectionY, tmpDyConnectionY);
+          canvas.drawLine(a, b, paint);
+        } else {
+          canvas.drawLine(
+            contour.positionsList[connection.x].scale(scaleX, scaleY),
+            contour.positionsList[connection.y].scale(scaleX, scaleY),
+            paint,
+          );
+        }
       }
 
       canvas.drawRRect(
@@ -122,6 +147,7 @@ class FaceDetectorPainter extends CustomPainter {
           widgetSize: size,
           scaleX: scaleX,
           scaleY: scaleY,
+          camPos: camPos,
         ),
         greenPaint,
       );
@@ -141,12 +167,23 @@ RRect _scaleRect({
   required Size widgetSize,
   required double scaleX,
   required double scaleY,
+  required bool camPos,
 }) {
-  return RRect.fromLTRBR(
-    widgetSize.width - rect.left * scaleX,
-    rect.top * scaleY,
-    widgetSize.width - rect.right * scaleX,
-    rect.bottom * scaleY,
-    const Radius.circular(8),
-  );
+  if (!camPos) {
+    return RRect.fromLTRBR(
+      widgetSize.width - rect.left * scaleX,
+      rect.top * scaleY,
+      widgetSize.width - rect.right * scaleX,
+      rect.bottom * scaleY,
+      const Radius.circular(8),
+    );
+  } else {
+    return RRect.fromLTRBR(
+      rect.left * scaleX,
+      rect.top * scaleY,
+      rect.right * scaleX,
+      rect.bottom * scaleY,
+      const Radius.circular(8),
+    );
+  }
 }

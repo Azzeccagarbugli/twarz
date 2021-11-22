@@ -4,6 +4,7 @@ import 'package:google_ml_vision/google_ml_vision.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/widgets/animated_button.dart';
 import 'package:twarz/ui/widgets/bottom_card.dart';
+import 'package:twarz/ui/widgets/load_camera.dart';
 import 'package:twarz/utils/detector.dart';
 import 'package:twarz/utils/scanner.dart';
 
@@ -137,6 +138,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     _cameraController.dispose();
+    _faceDetector.close();
     super.dispose();
   }
 
@@ -229,24 +231,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class LoadCamera extends StatelessWidget {
-  const LoadCamera({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.grey.shade200),
-      child: const Center(
-        child: Icon(
-          Icons.psychology_rounded,
-          color: kBackgroundColor,
-          size: 200,
-        ),
       ),
     );
   }

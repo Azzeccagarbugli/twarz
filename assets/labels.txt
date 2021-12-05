@@ -1,0 +1,7 @@
+0 Anger
+1 Cringe
+2 Disgust
+3 Fear
+4 Joy
+5 Sadness
+6 Surprise

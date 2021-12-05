@@ -9,17 +9,22 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+  another_flushbar: ^1.10.26
   auto_size_text: ^3.0.0-nullsafety.0
   camera: ^0.9.4+3
+  csv: ^5.0.1
+  ext_storage:
+    git:
+      url: git://github.com/lavahasif/ext_storage_ups.git
   flutter:
     sdk: flutter
   google_fonts: ^2.1.0
   google_ml_vision: ^0.0.7
   no_glow_scroll: ^0.0.2
   permission_handler: ^8.2.5
-  radar_chart: ^2.1.0
   shared_preferences: ^2.0.9
   smooth_page_indicator: ^1.0.0+2
+  tflite: ^1.1.2
   wave: ^0.2.0
   your_splash:
     git:
@@ -41,3 +46,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/onboarding/
+    - assets/labels.txt
+    - assets/model_unquant.tflite

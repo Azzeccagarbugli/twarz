@@ -7,6 +7,9 @@
     <!-- Permissions options for the `internet` group -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Permissions options for the `download` group -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
    <application
         android:label="twarz"
         android:icon="@mipmap/ic_launcher">

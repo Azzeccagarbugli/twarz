@@ -1,6 +1,14 @@
+import 'dart:io';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:camera/camera.dart';
+import 'package:csv/csv.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_vision/google_ml_vision.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:tflite/tflite.dart';
+import 'package:twarz/model/emotions.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/widgets/animated_button.dart';
 import 'package:twarz/ui/widgets/bottom_card.dart';
@@ -27,14 +35,18 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
-  List<double> values1 = [0.4, 0.8, 0.65];
-  List<double> values2 = [0.5, 0.3, 0.85];
-
   bool _isDetecting = false;
   dynamic _scanResults;
 
   late CameraController _cameraController;
   CameraLensDirection _direction = CameraLensDirection.front;
+
+  CameraImage? cameraImage;
+
+  String? output;
+  double? confidence;
+
+  List<dynamic> listCSV = [];
 
   final FaceDetector _faceDetector = GoogleVision.instance
       .faceDetector(const FaceDetectorOptions(enableContours: true));
@@ -66,6 +78,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         (dynamic results) {
           setState(() {
             _scanResults = results;
+            cameraImage = image;
           });
         },
       ).whenComplete(
@@ -76,6 +89,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           () => {_isDetecting = false},
         ),
       );
+
+      _runModel();
     });
   }
 
@@ -117,6 +132,83 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _runModel() async {
+    if (cameraImage != null) {
+      final predictions = await Tflite.runModelOnFrame(
+        bytesList: cameraImage!.planes.map((plane) {
+          return plane.bytes;
+        }).toList(),
+        imageHeight: cameraImage!.height,
+        imageWidth: cameraImage!.width,
+      );
+      for (final element in predictions!) {
+        setState(() {
+          output = element['label'] as String;
+          confidence = element['confidence'] as double;
+          listCSV.add({
+            'datetime': DateTime.now(),
+            'emotion': (element['label'] as String)[0],
+            'confidence': confidence,
+          });
+        });
+      }
+    }
+  }
+
+  Future<void> _loadModel() async {
+    await Tflite.loadModel(
+      model: 'assets/model_unquant.tflite',
+      labels: 'assets/labels.txt',
+    );
+  }
+
+  Future<void> _createCSV() async {
+    final Map<Permission, PermissionStatus> statuses = await [
+      Permission.storage,
+    ].request();
+
+    debugPrint(statuses.toString());
+
+    final List<List<dynamic>> rows = [];
+
+    final List<dynamic> row = [];
+    row.add('datetime');
+    row.add('emotion');
+    row.add('confidence');
+    rows.add(row);
+    for (int i = 0; i < listCSV.length; i++) {
+      final row = [];
+      row.add(listCSV[i]['datetime']);
+      row.add(listCSV[i]['emotion']);
+      row.add(listCSV[i]['confidence']);
+      rows.add(row);
+    }
+
+    final csv = const ListToCsvConverter().convert(rows);
+
+    final dir = await ExtStorage.getExternalStoragePublicDirectory(
+      ExtStorage.DIRECTORY_DOWNLOADS,
+    );
+
+    debugPrint("dir $dir");
+
+    final f = File(
+      '$dir/twarz.csv',
+    );
+
+    f.writeAsString(csv);
+
+    // ignore: use_build_context_synchronously
+    Flushbar(
+      title: 'Download completed',
+      message:
+          'You will find the CVS file just downloaded in your download directory. Have fun!',
+      duration: const Duration(seconds: 5),
+      flushbarPosition: FlushbarPosition.TOP,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+    ).show(context);
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!_cameraController.value.isInitialized) {
@@ -133,12 +225,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _initializeCamera();
+    _loadModel();
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
     _faceDetector.close();
+    Tflite.close();
     super.dispose();
   }
 
@@ -181,15 +275,23 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               ),
               child: Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(kSpaceM),
-                    child: BottomCard(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: kSpaceS,
+                      vertical: kSpaceS,
+                    ),
+                    child: BottomCard(
+                      informationEmotion: EmotionUtilities.conversion()[output],
+                      confidence: confidence ?? 0.0,
+                    ),
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: kSpaceM,
-                        vertical: kSpaceS,
+                      padding: const EdgeInsets.fromLTRB(
+                        kSpaceS,
+                        0,
+                        kSpaceS,
+                        kSpaceS,
                       ),
                       child: Row(
                         children: [
@@ -199,7 +301,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: kBorderRadius,
-                                  color: Colors.grey.shade400,
+                                  color: Colors.blue.shade400,
                                 ),
                                 child: const Center(
                                   child: Icon(
@@ -215,7 +317,28 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                             width: kSpaceS,
                           ),
                           Expanded(
-                            flex: 4,
+                            child: GestureDetector(
+                              onTap: _createCSV,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: kBorderRadius,
+                                  color: Colors.green.shade400,
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.download_rounded,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: kSpaceS,
+                          ),
+                          Expanded(
+                            flex: 3,
                             child: AnimatedButton(
                               title: 'Find more',
                               onTap: () {},

@@ -113,15 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.1"
-  ext_storage:
+  downloads_path_provider_28:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: acdb02277521a6f3641f73a97485e0f219a4227a
-      url: "git://github.com/lavahasif/ext_storage_ups.git"
-    source: git
-    version: "1.0.3"
+      name: downloads_path_provider_28
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
   fake_async:
     dependency: transitive
     description:
@@ -214,6 +212,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.4.0"
   lint:
     dependency: "direct dev"
     description:
@@ -457,6 +462,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  teledart:
+    dependency: "direct main"
+    description:
+      name: teledart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   term_glyph:
     dependency: transitive
     description:

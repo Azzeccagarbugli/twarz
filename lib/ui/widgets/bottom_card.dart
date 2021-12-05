@@ -27,7 +27,7 @@ class BottomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(seconds: 5),
       padding: const EdgeInsets.all(kSpaceXS),
       decoration: BoxDecoration(
         borderRadius: kBorderRadius,
@@ -37,7 +37,7 @@ class BottomCard extends StatelessWidget {
         children: [
           Expanded(
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(seconds: 4),
               padding: const EdgeInsets.all(kSpaceM),
               decoration: BoxDecoration(
                 borderRadius: kBorderRadius,

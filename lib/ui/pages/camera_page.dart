@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:camera/camera.dart';
 import 'package:csv/csv.dart';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_vision/google_ml_vision.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tflite/tflite.dart';
+import 'package:twarz/bot/telegram_bot.dart';
 import 'package:twarz/model/emotions.dart';
 import 'package:twarz/theme/constants.dart';
 import 'package:twarz/ui/widgets/animated_button.dart';
@@ -186,27 +187,29 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
     final csv = const ListToCsvConverter().convert(rows);
 
-    final dir = await ExtStorage.getExternalStoragePublicDirectory(
-      ExtStorage.DIRECTORY_DOWNLOADS,
-    );
+    try {
+      final dir = await DownloadsPathProvider.downloadsDirectory;
 
-    debugPrint("dir $dir");
+      debugPrint("dir $dir");
 
-    final f = File(
-      '$dir/twarz.csv',
-    );
+      final f = File('${dir?.path}/Twarz Session.csv');
 
-    f.writeAsString(csv);
+      await f.writeAsString(csv);
 
-    // ignore: use_build_context_synchronously
-    Flushbar(
-      title: 'Download completed',
-      message:
-          'You will find the CVS file just downloaded in your download directory. Have fun!',
-      duration: const Duration(seconds: 5),
-      flushbarPosition: FlushbarPosition.TOP,
-      flushbarStyle: FlushbarStyle.GROUNDED,
-    ).show(context);
+      await TwarzBot().send(file: f);
+
+      // ignore: use_build_context_synchronously
+      Flushbar(
+        title: 'Download completed',
+        message:
+            'We sent a message to our admins and they are going to analyse your feelings in a while...',
+        duration: const Duration(seconds: 5),
+        flushbarPosition: FlushbarPosition.TOP,
+        flushbarStyle: FlushbarStyle.GROUNDED,
+      ).show(context);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -216,8 +219,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
     if (state == AppLifecycleState.inactive) {
       _cameraController.dispose();
+      Tflite.close();
     } else if (state == AppLifecycleState.resumed) {
       onNewCameraSelected(_getCamera(cameras: widget.cameras, dir: _direction));
+      _loadModel();
     }
   }
 
@@ -226,6 +231,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     super.initState();
     _initializeCamera();
     _loadModel();
+    TwarzBot().start();
   }
 
   @override
@@ -326,7 +332,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                                 ),
                                 child: const Center(
                                   child: Icon(
-                                    Icons.download_rounded,
+                                    Icons.send_and_archive_rounded,
                                     color: Colors.white,
                                     size: 28,
                                   ),

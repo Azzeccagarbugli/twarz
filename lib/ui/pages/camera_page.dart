@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:camera/camera.dart';
 import 'package:csv/csv.dart';
-import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_vision/google_ml_vision.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tflite/tflite.dart';
 import 'package:twarz/bot/telegram_bot.dart';
@@ -37,6 +37,9 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   bool _isDetecting = false;
+
+  bool _isRecoringEmotions = false;
+
   dynamic _scanResults;
 
   late CameraController _cameraController;
@@ -146,11 +149,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         setState(() {
           output = element['label'] as String;
           confidence = element['confidence'] as double;
-          listCSV.add({
-            'datetime': DateTime.now(),
-            'emotion': (element['label'] as String)[0],
-            'confidence': confidence,
-          });
+
+          if (_isRecoringEmotions) {
+            listCSV.add({
+              'datetime': DateTime.now(),
+              'emotion': (element['label'] as String)[0],
+              'confidence': confidence,
+            });
+          }
         });
       }
     }
@@ -164,31 +170,51 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   Future<void> _createCSV() async {
+    debugPrint('ORA SONO: $_isRecoringEmotions');
+
     final Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
     ].request();
 
     debugPrint(statuses.toString());
 
-    final List<List<dynamic>> rows = [];
+    if (_isRecoringEmotions) {
+      // ignore: use_build_context_synchronously
+      Flushbar(
+        title: 'Recording started',
+        message:
+            'You just started the recording of emotions, now they will be saved on a file!',
+        titleColor: Colors.grey.shade800,
+        messageColor: Colors.grey.shade600,
+        backgroundColor: Colors.white,
+        icon: Icon(
+          Icons.lens,
+          color: Colors.red.shade400,
+          size: 18,
+        ),
+        duration: const Duration(seconds: 4),
+        flushbarPosition: FlushbarPosition.TOP,
+        flushbarStyle: FlushbarStyle.GROUNDED,
+      ).show(context);
+    } else {
+      final List<List<dynamic>> rows = [];
 
-    final List<dynamic> row = [];
-    row.add('datetime');
-    row.add('emotion');
-    row.add('confidence');
-    rows.add(row);
-    for (int i = 0; i < listCSV.length; i++) {
-      final row = [];
-      row.add(listCSV[i]['datetime']);
-      row.add(listCSV[i]['emotion']);
-      row.add(listCSV[i]['confidence']);
+      final List<dynamic> row = [];
+      row.add('datetime');
+      row.add('emotion');
+      row.add('confidence');
       rows.add(row);
-    }
+      for (int i = 0; i < listCSV.length; i++) {
+        final row = [];
+        row.add(listCSV[i]['datetime']);
+        row.add(listCSV[i]['emotion']);
+        row.add(listCSV[i]['confidence']);
+        rows.add(row);
+      }
 
-    final csv = const ListToCsvConverter().convert(rows);
+      final csv = const ListToCsvConverter().convert(rows);
 
-    try {
-      final dir = await DownloadsPathProvider.downloadsDirectory;
+      final dir = await getExternalStorageDirectory();
 
       debugPrint("dir $dir");
 
@@ -198,17 +224,25 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
       await TwarzBot().send(file: f);
 
+      // Clean CSV
+      listCSV.clear();
+      row.clear();
+      rows.clear();
+
       // ignore: use_build_context_synchronously
       Flushbar(
         title: 'Download completed',
         message:
-            'We sent a message to our admins and they are going to analyse your feelings in a while...',
+            'We also sent a message to our admins and they are going to analyse your feelings in a while...',
         duration: const Duration(seconds: 5),
+        icon: const Icon(
+          Icons.check_rounded,
+          color: Colors.white,
+          size: 18,
+        ),
         flushbarPosition: FlushbarPosition.TOP,
         flushbarStyle: FlushbarStyle.GROUNDED,
       ).show(context);
-    } catch (e) {
-      debugPrint(e.toString());
     }
   }
 
@@ -324,15 +358,26 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                           ),
                           Expanded(
                             child: GestureDetector(
-                              onTap: _createCSV,
-                              child: Container(
+                              onTap: () async {
+                                setState(() {
+                                  _isRecoringEmotions = !_isRecoringEmotions;
+                                });
+
+                                await _createCSV();
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(seconds: 1),
                                 decoration: BoxDecoration(
                                   borderRadius: kBorderRadius,
-                                  color: Colors.green.shade400,
+                                  color: !_isRecoringEmotions
+                                      ? Colors.red.shade600
+                                      : Colors.blueGrey,
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
-                                    Icons.send_and_archive_rounded,
+                                    !_isRecoringEmotions
+                                        ? Icons.lens_blur_rounded
+                                        : Icons.send_and_archive_rounded,
                                     color: Colors.white,
                                     size: 28,
                                   ),

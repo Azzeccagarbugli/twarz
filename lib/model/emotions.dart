@@ -68,10 +68,10 @@ extension EmotionUtilities on Emotion {
           color: Colors.brown.shade700,
         ),
         '6 Surprise': InformationEmotion(
-          title: 'Surprirse',
+          title: 'Surprise',
           subtitle:
               'Surprise is a brief mental and physiological state, a startle response experienced by animals and humans as the result of an unexpected event. Surprise can have any valence; that is, it can be neutral/moderate, pleasant, unpleasant, positive, or negative',
-          goTo: 'Surprirse',
+          goTo: 'Surprise',
           color: Colors.blueAccent.shade700,
         ),
       };

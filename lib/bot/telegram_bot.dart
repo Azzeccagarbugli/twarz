@@ -10,10 +10,6 @@ class TwarzBot {
 
   static const tokenBotEnv = '5068692598:AAFfoHU3VAp8TALf0Tb_Im840eFGQk1PWgE';
 
-  static const userAdminEnv = 631070825;
-
-  static const userFounderEnv = 162104524;
-
   final teledart = TeleDart(
     Telegram(tokenBotEnv),
     Event('Ciao!'),
@@ -23,14 +19,30 @@ class TwarzBot {
     teledart.start();
   }
 
-  Future<void> send({required dynamic file}) async {
-    final _users = [userAdminEnv, userFounderEnv];
+  Future<void> send({required dynamic file, required int lines}) async {
+    final _users = {
+      631070825: 'Tere',
+      162104524: 'Fra',
+      354933785: 'Mary',
+    };
 
-    for (final userId in _users) {
+    final _now = DateTime.now().toString().split('.')[0];
+
+    for (final userId in _users.keys) {
+      final _msg = '''
+🧠  *Twarz Session*
+
+⏰  *Recorded at:* _${_now}_
+📊  *Lines in the CVS*: _${lines}_
+
+👋  _Have fun in the analysis ${_users[userId]}!_
+    ''';
+
       await teledart.telegram.sendDocument(
         userId,
         file,
-        caption: 'Twarz session recorded at ${DateTime.now()}. Have fun 👋',
+        caption: _msg,
+        parse_mode: 'Markdown',
       );
     }
   }

@@ -223,7 +223,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
       await f.writeAsString(csv);
 
-      await TwarzBot().send(file: f);
+      await TwarzBot().send(
+        file: f,
+        lines: listCSV.length,
+      );
 
       // Clean CSV
       listCSV.clear();
@@ -372,18 +375,16 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                                 await _createCSV();
                               },
                               child: AnimatedContainer(
-                                duration: const Duration(seconds: 1),
+                                duration: const Duration(milliseconds: 400),
                                 decoration: BoxDecoration(
                                   borderRadius: kBorderRadius,
                                   border: Border.all(
-                                    color: !_isRecoringEmotions
-                                        ? Colors.red.shade500
-                                        : Colors.blueGrey.shade600,
+                                    color: Colors.red.shade500,
                                     width: 4.0,
                                   ),
                                   color: !_isRecoringEmotions
                                       ? Colors.white
-                                      : Colors.blueGrey,
+                                      : Colors.red.shade500,
                                 ),
                                 child: Center(
                                   child: Icon(

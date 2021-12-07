@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:camera/camera.dart';
@@ -320,9 +321,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                       horizontal: kSpaceS,
                       vertical: kSpaceS,
                     ),
-                    child: BottomCard(
-                      informationEmotion: EmotionUtilities.conversion()[output],
-                      confidence: confidence ?? 0.0,
+                    child: AnimatedOpacity(
+                      duration: const Duration(seconds: 1),
+                      opacity: _isRecoringEmotions ? 0.05 : 1,
+                      child: BottomCard(
+                        informationEmotion:
+                            EmotionUtilities.conversion()[output],
+                        confidence: confidence ?? 0.0,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -369,16 +375,24 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                                 duration: const Duration(seconds: 1),
                                 decoration: BoxDecoration(
                                   borderRadius: kBorderRadius,
+                                  border: Border.all(
+                                    color: !_isRecoringEmotions
+                                        ? Colors.red.shade500
+                                        : Colors.blueGrey.shade600,
+                                    width: 4.0,
+                                  ),
                                   color: !_isRecoringEmotions
-                                      ? Colors.red.shade600
+                                      ? Colors.white
                                       : Colors.blueGrey,
                                 ),
                                 child: Center(
                                   child: Icon(
                                     !_isRecoringEmotions
-                                        ? Icons.lens_blur_rounded
+                                        ? Icons.fiber_smart_record_rounded
                                         : Icons.send_and_archive_rounded,
-                                    color: Colors.white,
+                                    color: !_isRecoringEmotions
+                                        ? Colors.red.shade500
+                                        : Colors.white,
                                     size: 28,
                                   ),
                                 ),

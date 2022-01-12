@@ -1,16 +1,23 @@
-# twarz
+![twarz](https://socialify.git.ci/Azzeccagarbugli/twarz/image?description=1&font=Bitter&issues=1&logo=https%3A%2F%2Fgithub.com%2FAzzeccagarbugli%2Ftwarz%2Fblob%2Fmain%2Fassets%2Flogo.png%3Fraw%3Dtrue&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Dark)
+## 👋 Introduction
+**Twarz** is a data collection system that allows researchers to easily collect data in order to
+build specific datasets for research purposes involving emotion recognition through
+facial expressions.
 
-A new Flutter project.
+There already exists some emotional expressions datasets, which are often related to specific problems and contexts. However, the need for new datasets is constantly emphasized, in order to address **new issues and research questions**. 
 
-## Getting Started
+Moreover, the ever-growing development of new technologies and tools opens many possibilities to faster and more precise techniques which aim to capture and analyze a wide range of
+nonverbal behaviors and emotions.
+## 🤖 Software stack
 
-This project is a starting point for a Flutter application.
+![Stack](materials/stack.png)
+## ⚙️ Contributing
 
-A few resources to get you started if this is your first Flutter project:
+If you want to contribute to **Twarz**, feel free to open a pull request.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+This project will use [GitHub issues](https://github.com/Azzeccagarbugli/twarz/issues) for tracking **requests and bugs**, so please *don't use* issues for general questions and discussion.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## 🗂 License
+
+This project is licensed under the **LGPL v3.0 License** - see the [LICENSE](LICENSE) file for details.
